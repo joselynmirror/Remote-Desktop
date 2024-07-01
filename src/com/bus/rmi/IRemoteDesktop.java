@@ -24,4 +24,7 @@ public interface IRemoteDesktop extends Remote {
     long[] getRamMemories() throws RemoteException;
     int getCpus() throws RemoteException;
     ComputerInfo getComputerInformation() throws RemoteException;
+
+    void initBoard() throws RemoteException;
+    void eraseBoard() throws RemoteException;
 }

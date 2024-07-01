@@ -10,19 +10,25 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLOutput;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class RemoteDesktopImpl extends UnicastRemoteObject implements IRemoteDesktop {
     public final static int GB = 1024 * 1024 * 1024;
 
     private Robot mr_robot;
     private OperatingSystemMXBean os;
+    private boolean clickPressed;
 
     public RemoteDesktopImpl() throws RemoteException, AWTException {
         super();
         this.mr_robot = new Robot();
         this.os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        this.clickPressed = false;
     }
 
     @Override
@@ -39,16 +45,26 @@ public class RemoteDesktopImpl extends UnicastRemoteObject implements IRemoteDes
     // TODO: mouse
     @Override
     public void mouseMovedServer(int x, int y) throws RemoteException {
+        OverlayDrawing frame = OverlayDrawing.getInstance();
+        if (frame.isVisible() && this.clickPressed) {
+            frame.addPoint(x, y);
+        }
         this.mr_robot.mouseMove(x, y);
     }
 
     @Override
     public void mousePressedServer(int buttons) throws RemoteException {
+        if (buttons == 1024) {
+            this.clickPressed = true;
+        }
         this.mr_robot.mousePress(buttons);
     }
 
     @Override
     public void mouseReleasedServer(int buttons) throws RemoteException {
+        if (buttons == 1024) {
+            this.clickPressed = false;
+        }
         this.mr_robot.mouseRelease(buttons);
     }
 
@@ -108,4 +124,18 @@ public class RemoteDesktopImpl extends UnicastRemoteObject implements IRemoteDes
         }
         return pc_info;
     }
+
+    @Override
+    public void initBoard() throws RemoteException {
+        OverlayDrawing frame = OverlayDrawing.getInstance();
+        frame.setVisible(true);
+    }
+
+    @Override
+    public void eraseBoard() throws RemoteException {
+        OverlayDrawing frame = OverlayDrawing.getInstance();
+        frame.setVisible(false);
+        frame.removePoints();
+    }
 }
+

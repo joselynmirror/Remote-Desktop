@@ -19,6 +19,8 @@ public class RemoteFrame extends JFrame implements Runnable {
     private JLabel screen_label;
     private JMenuBar menu_bar;
     private JMenu menu_monitor;
+    private JMenu menu_board;
+    private JMenu menu_erase_all;
     private HardwareDialog hardware_dialog;
 
     private Dimension screen_size;
@@ -105,6 +107,8 @@ public class RemoteFrame extends JFrame implements Runnable {
         this.screen_label = new JLabel();
         this.menu_bar = new JMenuBar();
         this.menu_monitor = new JMenu();
+        this.menu_board = new JMenu();
+        this.menu_erase_all = new JMenu();
         this.hardware_dialog = new HardwareDialog(this, this.remote_obj);
 
         // TODO: set minimum size of remote frame
@@ -189,6 +193,52 @@ public class RemoteFrame extends JFrame implements Runnable {
             }
         });
         this.menu_bar.add(menu_monitor);
+
+        this.menu_board.setText("Pizarra");
+        this.menu_board.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                try {
+                    menuBoardMousePressed(e);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                menuBoardMouseEntered(e);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                menuBoardMouseExited(e);
+            }
+        });
+        this.menu_bar.add(menu_board);
+
+        this.menu_erase_all.setText("Borrar todo");
+        this.menu_erase_all.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                try {
+                    menuEraseAllMousePressed(e);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                menuEraseAllMouseEntered(e);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                menuEraseAllMouseExited(e);
+            }
+        });
+        this.menu_bar.add(menu_erase_all);
     }
 
     private void setupWindow() throws Exception {
@@ -314,6 +364,38 @@ public class RemoteFrame extends JFrame implements Runnable {
 
     private void menuMonitorMouseExited(MouseEvent e) {
         this.menu_monitor.setFont(new Font("segoe ui", Font.PLAIN, 14));
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    private void menuBoardMousePressed(MouseEvent e) throws RemoteException {
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            this.remote_obj.initBoard();
+        }
+    }
+
+    private void menuBoardMouseEntered(MouseEvent e) {
+        this.menu_board.setFont(new Font("segoe ui", Font.BOLD, 16));
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    private void menuBoardMouseExited(MouseEvent e) {
+        this.menu_board.setFont(new Font("segoe ui", Font.PLAIN, 14));
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    private void menuEraseAllMousePressed(MouseEvent e) throws RemoteException {
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            this.remote_obj.eraseBoard();
+        }
+    }
+
+    private void menuEraseAllMouseEntered(MouseEvent e) {
+        this.menu_erase_all.setFont(new Font("segoe ui", Font.BOLD, 16));
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    private void menuEraseAllMouseExited(MouseEvent e) {
+        this.menu_erase_all.setFont(new Font("segoe ui", Font.PLAIN, 14));
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 }
